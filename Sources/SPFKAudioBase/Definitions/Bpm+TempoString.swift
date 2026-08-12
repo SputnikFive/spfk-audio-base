@@ -19,15 +19,30 @@ extension Bpm {
 
     private static func extractTempoValue(from string: String) -> Double? {
         // "Tempo: 120", "Tempo 120", "BPM 120", "BPM120"
-        if let match = string.firstMatch(of: /(?i)(?:tempo[: ]+|bpm[ ]*)(\d+(?:\.\d+)?)/) {
-            return Double(String(match.output.1))
+        if let value = firstCaptureGroup(in: string, pattern: "(?:tempo[: ]+|bpm[ ]*)(\\d+(?:\\.\\d+)?)") {
+            return Double(value)
         }
 
         // "120 BPM", "120bpm"
-        if let match = string.firstMatch(of: /(?i)(\d+(?:\.\d+)?)[ ]*bpm/) {
-            return Double(String(match.output.1))
+        if let value = firstCaptureGroup(in: string, pattern: "(\\d+(?:\\.\\d+)?)[ ]*bpm") {
+            return Double(value)
         }
 
         return nil
+    }
+
+    /// Returns the first capture group of the first match, or nil. Uses NSRegularExpression so the
+    /// parsing runs on iOS 15 (the Swift Regex literals it replaced require iOS 16).
+    private static func firstCaptureGroup(in string: String, pattern: String) -> String? {
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else {
+            return nil
+        }
+        let fullRange = NSRange(string.startIndex..., in: string)
+        guard let match = regex.firstMatch(in: string, options: [], range: fullRange),
+              match.numberOfRanges > 1,
+              let captureRange = Range(match.range(at: 1), in: string) else {
+            return nil
+        }
+        return String(string[captureRange])
     }
 }
