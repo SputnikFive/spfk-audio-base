@@ -14,7 +14,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/SputnikFive/spfk-base", branch: "ios15"),
+        .package(url: "https://github.com/SputnikFive/spfk-base", exact: "0.0.12-ios15"),
         .package(url: "https://github.com/ryanfrancesconi/spfk-testing", from: "0.0.9"),
     ],
     targets: [
